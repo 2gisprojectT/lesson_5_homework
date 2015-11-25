@@ -15,18 +15,10 @@ class SeleniumTest(TestCase):
     def test_email(self):
         action = ActionChains(self.driver)
         self.driver.implicitly_wait(30)
-        lang = self.driver.find_element_by_id('locale-link').text  # текущий язык
         action.send_keys('max@')  # почта без доменной части
         action.perform()
-
         self.driver.find_element_by_xpath('//*[@id="regular-login-forms"]/form[1]/div[4]/button').click()  # «Войти»
         text = self.driver.find_element_by_class_name('error-message').text
 
-        if lang == 'Pусский':
-            message = 'Неверное название домена (часть адреса эл. почты после символа @: ).'
-        elif lang == 'English (United States)':
-            message = 'The domain portion of the email address is invalid (the portion after the @: )'
-        else:
-            raise TypeError
-
-        self.assertEqual(message, text)
+        self.assertIn(text, ['Неверное название домена (часть адреса эл. почты после символа @: ).',
+                             'The domain portion of the email address is invalid (the portion after the @: )'])
