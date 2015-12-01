@@ -3,7 +3,7 @@ import unittest
 from unittest import TestCase
 from selenium import webdriver
 
-class Status_Button_Disabled_Test(TestCase):
+class StatusButtonDisabledTest(TestCase):
 
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -17,7 +17,7 @@ class Status_Button_Disabled_Test(TestCase):
         поле "когда" оставляем пустым
         и проверяем статус кнопки "Найти"
         надо, чтобы статус кнопки при этом был disabled
-	"""
+        """
 		
         field_from = self.driver.find_element_by_name('from0')
         field_from.send_keys('Новосибирск')
@@ -26,7 +26,7 @@ class Status_Button_Disabled_Test(TestCase):
         field_to.send_keys('Москва')
 
         button_status = self.driver.find_element_by_name('submit')
-	self.assertFalse(button_status.is_enabled())
+        self.assertFalse(button_status.is_enabled())
 
     def tearDown(self):
         self.driver.quit()
