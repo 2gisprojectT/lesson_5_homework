@@ -1,14 +1,15 @@
 # coding: UTF-8
 from unittest import TestCase
 from selenium import webdriver
-import unittest
-import time
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class OnetwotripTestingBookingForm(TestCase):
     """
     Проверка формы бронирования на сайте http://www.onetwotrip.com
     """
+
     def setUp(self):
         """
         Предусловия:
@@ -17,16 +18,17 @@ class OnetwotripTestingBookingForm(TestCase):
         выбрать некоторый рейс из предложенных.
         """
         self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(20)
+        self.driver.implicitly_wait(10)
         self.driver.get('http://www.onetwotrip.com')
         self.driver.find_element_by_css_selector('#from0').send_keys('Москва')
-        self.driver.find_element_by_css_selector('#to0').send_keys('Минск')
+        self.driver.find_element_by_css_selector('#to0').send_keys('Новосибирск')
         self.driver.find_element_by_css_selector('#date0').click()
-        self.driver.find_element_by_css_selector('.calendar').click()
+        self.driver.find_element_by_xpath("//*[contains(@Class,'1450634400000')]").click()  # 21.12.2015
         self.driver.find_element_by_css_selector('#date1').click()
-        self.driver.find_element_by_css_selector('.calendar').click()
+        self.driver.find_element_by_xpath("//*[contains(@Class,'1451152800000')]").click()  # 27.12.2015
         self.driver.find_element_by_class_name('search').click()
-        self.driver.find_element_by_class_name('price_button').click()
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located,
+                                             self.driver.find_element_by_class_name('price_button').click())
 
     def test_GoodValues(self):
         """
@@ -38,16 +40,20 @@ class OnetwotripTestingBookingForm(TestCase):
             4.Ввести корректную дату рождения
             5.Ввести корректный номер документа, если есть поле "Документ"
             6.Нажать кнопку "Отправить"
-        Ожидаемый результат: переход на страницу "Оформление билета"
         """
-        self.driver.find_element_by_css_selector('#input_avia_book_email').send_keys('test@test.ru')
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located,
+                                             self.driver.find_element_by_css_selector(
+                                                 '#input_avia_book_email').send_keys('test@test.ru'))
         self.driver.find_element_by_css_selector('#input_lastName0').send_keys('Pozdnyshev')
         self.driver.find_element_by_css_selector('#input_firstName0').send_keys('Maxim')
         self.driver.find_element_by_css_selector('#input_birthDate0').send_keys('25.04.1994')
-        # self.driver.find_element_by_css_selector('#input_passNumber0').send_keys('123456')
+        self.driver.find_element_by_css_selector('#input_passNumber0').send_keys('123456')
         self.driver.find_element_by_class_name('submit').submit()
-        time.sleep(20)
-
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located,
+                                             self.driver.find_element_by_css_selector('#pay_avia_order'))
+        """
+        Ожидаемый результат: переход на страницу "Оформление билета"
+        """
         text = self.driver.find_element_by_css_selector('#pageTitle').text
         self.assertEqual('Оформление билета', text)
 
