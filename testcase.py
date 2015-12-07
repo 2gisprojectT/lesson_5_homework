@@ -15,7 +15,7 @@ class FirstTestCase(unittest.TestCase):
 
     def setUp(self):
         self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(20)
+        self.driver.implicitly_wait(5)
         self.driver.get('2gis.ru')
 
     def tearDown(self):
@@ -25,6 +25,7 @@ class FirstTestCase(unittest.TestCase):
         action = ActionChains(self.driver)
         action.send_keys('1260')
         action.perform()
+        
         self.driver.find_element_by_class_name('suggest__suggestsItem:last-child').click()
         text = self.driver.find_element_by_class_name('routeCard__headerNote').text
         self.assertEqual('(1260)', text)
