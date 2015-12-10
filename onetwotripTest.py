@@ -28,8 +28,8 @@ class OnetwotripTestingBookingForm(TestCase):
         self.driver.find_element_by_css_selector('#date1').click()
         self.driver.find_element_by_xpath("//*[contains(@Class,'1451152800000')]").click()  # 27.12.2015
         self.driver.find_element_by_class_name('search').click()
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'price_button')))
-        self.driver.find_element_by_class_name('price_button').click()
+        price_button = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'price_button')))
+        price_button.click()
 
     def test_GoodValues(self):
         """
@@ -42,15 +42,15 @@ class OnetwotripTestingBookingForm(TestCase):
             5.Ввести корректный номер документа, если есть поле "Документ"
             6.Нажать кнопку "Отправить"
         """
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#input_avia_book_email')))
+        input_avia_book_email = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#input_avia_book_email')))
         self.driver.find_element_by_css_selector('#input_avia_book_email').send_keys('test@test.ru')
         self.driver.find_element_by_css_selector('#input_lastName0').send_keys('Pozdnyshev')
         self.driver.find_element_by_css_selector('#input_firstName0').send_keys('Maxim')
         self.driver.find_element_by_css_selector('#input_birthDate0').send_keys('25.04.1994')
         self.driver.find_element_by_css_selector('#input_passNumber0').send_keys('123456')
         self.driver.find_element_by_class_name('submit').submit()
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#pay_avia_order')))
-        self.driver.find_element_by_css_selector('#pay_avia_order')
+        pay_avia_order = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#pay_avia_order')))
+        pay_avia_order.click()
 
         #Ожидаемый результат: переход на страницу "Оформление билета"
         text = self.driver.find_element_by_css_selector('#pageTitle').text
