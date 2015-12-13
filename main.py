@@ -13,15 +13,15 @@ class TestForMailGoogle(TestCase):
         Оставляем тему сообщения пустой строкой
         Сохранить в черновиках
     Expected Result
-        Письмо будет сохранено в черновиках, в качестве темы сообщения будет указано <без темы>."""
+        Письмо будет сохранено в черновиках."""
 
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.get("http://google.com/")
         self.driver.implicitly_wait(10)
 
-    #def tearDown(self):
-        #self.driver.quit()
+    def tearDown(self):
+        self.driver.quit()
 
     def login(self):
         element = self.driver.find_element_by_css_selector("a.gb_Pd")
@@ -30,33 +30,24 @@ class TestForMailGoogle(TestCase):
 
         email = self.driver.find_element_by_id("Email")
         email.send_keys("lesson5homework")
-
-        emailButton = self.driver.find_element_by_id("next")
-        emailButton.submit()
+        email_button = self.driver.find_element_by_id("next")
+        email_button.submit()
 
         password = self.driver.find_element_by_id("Passwd")
         password.send_keys("projectt")
-
-        passwordButton = self.driver.find_element_by_id("signIn")
-        passwordButton.submit()
-
-    def openMail(self):
-        self.driver.get("http://google.com/")
-        element = self.driver.find_element_by_css_selector("a.gb_P")
-        link = element.get_attribute("href")
-        self.driver.get(link)
+        password_button = self.driver.find_element_by_id("signIn")
+        password_button.submit()
 
     def getNumberOfDrafts(self):
         element = self.driver.find_element_by_xpath("//div[@id=':4v']/div/div/span/a")
         text = element.get_attribute("title")
-        count = float(text[11:-1])
+        if text == "Черновики":
+            count = 0
+        else:
+            count = float(text[11:-1])
         return count
 
-    def testSubjectOfTheMessageIsEmpty(self):
-        self.login()
-        self.openMail()
-        old_count = self.getNumberOfDrafts()
-
+    def createMessage(self):
         element = self.driver.find_element_by_css_selector("div.T-I.J-J5-Ji.T-I-KE.L3")
         element.click()
 
@@ -66,14 +57,20 @@ class TestForMailGoogle(TestCase):
         close = self.driver.find_element_by_css_selector("img.Ha")
         close.click()
 
-
+    def wait(self):
         try:
             WebDriverWait(self.driver, 1).until(
                 EC.title_contains("wait_for_1_second")
             )
-            new_count = old_count
         except TimeoutException:
-            new_count = self.getNumberOfDrafts()
+            return
 
+    def testSubjectOfTheMessageIsEmpty(self):
+        self.login()
+        self.driver.get("http://mail.google.com/")
+        old_count = self.getNumberOfDrafts()
+        self.createMessage()
+        self.wait()
+        new_count = self.getNumberOfDrafts()
         self.assertEqual(1, new_count - old_count)
 
