@@ -13,14 +13,24 @@ class StatusFindButton(TestCase):
         self.driver.quit()
 
     def test_status_find_button(self):
-        """ Описание тест кейса: https://projectt2015.testrail.net/index.php?/cases/edit/495 """
-        _from = self.driver.find_element_by_xpath("//div[@id='SearchForm']/div/div/div[1]/div/label/input")
-        _from.clear()
-        _from.send_keys('Новосибирск')
+        """ Описание тест кейса: https://projectt2015.testrail.net/index.php?/cases/edit/495
+        ### Preconditions
+        - Зайти на сайт https://www.onetwotrip.com/ru/railways
 
-        _to = self.driver.find_element_by_xpath("//div[@id='SearchForm']/div/div/div[2]/div/label/input")
-        _to.clear()
-        _to.send_keys('Рубцовск')
+        ### Step
+        - В поле "Откуда" набрать "Новосибирск"
+        - В поле "Куда" набрать "Рубцовск"
+        - Проверить, что кнопка "Найти" активна.
 
-        _go = self.driver.find_element_by_xpath("//div[@id='SearchForm']/div/div/div[4]/button/div")
-        self.assertTrue(_go.is_enabled())
+        ### Expected Result
+        - Кнопка "Найти" активна, ее статус - enable.
+        """
+        whence = self.driver.find_element_by_xpath("//input[@placeholder='Откуда']")
+        whence.clear()
+        whence.send_keys('Новосибирск')
+
+        where = self.driver.find_element_by_xpath("//input[@placeholder='Куда']")
+        where.clear()
+        where.send_keys('Рубцовск')
+
+        self.assertTrue(self.driver.find_element_by_css_selector("div.spinner.spinner--is-search").is_enabled())
