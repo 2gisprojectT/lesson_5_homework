@@ -13,8 +13,7 @@ class TestForMailGoogle(TestCase):
         self.driver.quit()
 
     def login(self):
-        element = self.driver.find_element_by_css_selector("a.gb_Pd")
-        link = element.get_attribute("href")
+        link = self.driver.find_element_by_partial_link_text("Войти").get_attribute("href")
         self.driver.get(link)
 
         self.driver.find_element_by_id("Email").send_keys("lesson5homework")
@@ -24,8 +23,7 @@ class TestForMailGoogle(TestCase):
         self.driver.find_element_by_id("signIn").submit()
 
     def get_number_of_drafts(self):
-        element = self.driver.find_element_by_partial_link_text("Черновики")
-        text = element.get_attribute("title")
+        text = self.driver.find_element_by_partial_link_text("Черновики").get_attribute("title")
         if text == "Черновики":
             count = 0
         else:
@@ -33,15 +31,11 @@ class TestForMailGoogle(TestCase):
         return count
 
     def create_message(self):
-        element = self.driver.find_element_by_css_selector("div.T-I.J-J5-Ji.T-I-KE.L3")
-        element.click()
-
-        receiver = self.driver.find_element_by_css_selector("textarea.vO")
-        receiver.send_keys("lesson5homework@gmail.com")
+        self.driver.find_element_by_css_selector("div.T-I.J-J5-Ji.T-I-KE.L3").click()
+        self.driver.find_element_by_css_selector("textarea.vO").send_keys("lesson5homework@gmail.com")
 
     def save_in_drafts(self):
-        close = self.driver.find_element_by_css_selector("img.Ha")
-        close.click()
+        self.driver.find_element_by_css_selector("img.Ha").click()
 
     def wait(self):
         time.sleep(1)
