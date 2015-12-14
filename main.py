@@ -1,20 +1,9 @@
 from unittest import TestCase
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+import time
+
 
 class TestForMailGoogle(TestCase):
-    """Preconditions
-        Зайти на сайт http://mail.google.com/
-        Нажать на пункт меню Написать
-    Steps
-        Вводим имя пользователя - bstodin@gmail.com
-        Оставляем тему сообщения пустой строкой
-        Сохранить в черновиках
-    Expected Result
-        Письмо будет сохранено в черновиках."""
-
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.get("http://google.com/")
@@ -28,18 +17,14 @@ class TestForMailGoogle(TestCase):
         link = element.get_attribute("href")
         self.driver.get(link)
 
-        email = self.driver.find_element_by_id("Email")
-        email.send_keys("lesson5homework")
-        email_button = self.driver.find_element_by_id("next")
-        email_button.submit()
+        self.driver.find_element_by_id("Email").send_keys("lesson5homework")
+        self.driver.find_element_by_id("next").submit()
 
-        password = self.driver.find_element_by_id("Passwd")
-        password.send_keys("projectt")
-        password_button = self.driver.find_element_by_id("signIn")
-        password_button.submit()
+        self.driver.find_element_by_id("Passwd").send_keys("projectt")
+        self.driver.find_element_by_id("signIn").submit()
 
-    def getNumberOfDrafts(self):
-        element = self.driver.find_element_by_xpath("//div[@id=':4v']/div/div/span/a")
+    def get_number_of_drafts(self):
+        element = self.driver.find_element_by_partial_link_text("Черновики")
         text = element.get_attribute("title")
         if text == "Черновики":
             count = 0
@@ -47,30 +32,35 @@ class TestForMailGoogle(TestCase):
             count = float(text[11:-1])
         return count
 
-    def createMessage(self):
+    def create_message(self):
         element = self.driver.find_element_by_css_selector("div.T-I.J-J5-Ji.T-I-KE.L3")
         element.click()
 
         receiver = self.driver.find_element_by_css_selector("textarea.vO")
         receiver.send_keys("lesson5homework@gmail.com")
 
+    def save_in_drafts(self):
         close = self.driver.find_element_by_css_selector("img.Ha")
         close.click()
 
     def wait(self):
-        try:
-            WebDriverWait(self.driver, 1).until(
-                EC.title_contains("wait_for_1_second")
-            )
-        except TimeoutException:
-            return
+        time.sleep(1)
 
-    def testSubjectOfTheMessageIsEmpty(self):
+    def test_save_in_drafts(self):
+        """Preconditions
+            Авторизироваться на сайте http://mail.google.com/
+        Steps
+            Нажать на пункт меню Написать
+            Вводим имя пользователя - bstodin@gmail.com
+            Сохранить в черновиках
+        Expected Result
+            Письмо будет сохранено в черновиках."""
         self.login()
         self.driver.get("http://mail.google.com/")
-        old_count = self.getNumberOfDrafts()
-        self.createMessage()
+        old_count = self.get_number_of_drafts()
+        self.create_message()
+        self.save_in_drafts()
         self.wait()
-        new_count = self.getNumberOfDrafts()
+        new_count = self.get_number_of_drafts()
         self.assertEqual(1, new_count - old_count)
 
