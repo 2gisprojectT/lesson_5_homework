@@ -1,6 +1,9 @@
 from unittest import TestCase
 from selenium import webdriver
-import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 
 class TestForMailGoogle(TestCase):
@@ -9,8 +12,8 @@ class TestForMailGoogle(TestCase):
         self.driver.get("http://google.com/")
         self.driver.implicitly_wait(10)
 
-    def tearDown(self):
-        self.driver.quit()
+    #def tearDown(self):
+    #    self.driver.quit()
 
     def login(self):
         link = self.driver.find_element_by_partial_link_text("Войти").get_attribute("href")
@@ -27,7 +30,7 @@ class TestForMailGoogle(TestCase):
         if text == "Черновики":
             count = 0
         else:
-            count = float(text[11:-1])
+            count = int(text[11:-1])
         return count
 
     def create_message(self):
@@ -37,8 +40,14 @@ class TestForMailGoogle(TestCase):
     def save_in_drafts(self):
         self.driver.find_element_by_css_selector("img.Ha").click()
 
-    def wait(self):
-        time.sleep(1)
+    def check_new_draft(self):
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.text_to_be_present_in_element((By.ID, ":6j"), str(self.old_count + 1))
+            )
+            return True
+        except TimeoutException:
+            return False
 
     def test_save_in_drafts(self):
         """Preconditions
@@ -51,10 +60,10 @@ class TestForMailGoogle(TestCase):
             Письмо будет сохранено в черновиках."""
         self.login()
         self.driver.get("http://mail.google.com/")
-        old_count = self.get_number_of_drafts()
+        self.old_count = self.get_number_of_drafts()
+
         self.create_message()
         self.save_in_drafts()
-        self.wait()
-        new_count = self.get_number_of_drafts()
-        self.assertEqual(1, new_count - old_count)
+
+        self.assertTrue(self.check_new_draft())
 
